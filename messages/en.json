@@ -1,0 +1,16 @@
+{
+    "HomePage": {
+        "title": "Welcome to Vehicle Export",
+        "subtitle": "Your trusted partner for Japanese used vehicles"
+    },
+    "Navigation": {
+        "home": "Home",
+        "stock": "Stock List",
+        "about": "About Us",
+        "contact": "Contact"
+    },
+    "Common": {
+        "search": "Search",
+        "inquire": "Inquire"
+    }
+}
