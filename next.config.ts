@@ -10,27 +10,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'plus.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'placehold.co',
+        hostname: '**', // Allow any HTTPS domain (for external/scraped images)
       },
       {
         protocol: 'http',
-        hostname: 'localhost',
-      },
-      {
-        protocol: 'https',
-        hostname: 'erp.slict.lk',
-      },
-      {
-        protocol: 'https',
-        hostname: 'slict-erp.vercel.app', // In case using Vercel domain
+        hostname: 'localhost', // For local dev
       },
     ],
   },
