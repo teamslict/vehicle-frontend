@@ -5,6 +5,8 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
+    unoptimized: process.env.NODE_ENV === 'development',
+    dangerouslyAllowSVG: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -17,6 +19,18 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'placehold.co',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'erp.slict.lk',
+      },
+      {
+        protocol: 'https',
+        hostname: 'slict-erp.vercel.app', // In case using Vercel domain
       },
     ],
   },

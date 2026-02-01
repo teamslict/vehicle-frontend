@@ -189,9 +189,15 @@ export default function HomePage() {
                                 <VehicleCard key={vehicle.id} vehicle={vehicle} index={i} primaryColor={primaryColor} storeSlug={storeSlug} />
                             ))
                         ) : (
-                            Array.from({ length: 8 }).map((_, i) => (
-                                <VehicleCard key={i} index={i} primaryColor={primaryColor} storeSlug={storeSlug} />
-                            ))
+                            <div className="col-span-full flex flex-col items-center justify-center py-12 text-center bg-gray-100 rounded-xl border border-dashed border-gray-300">
+                                <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+                                    <Car className="w-8 h-8 text-gray-400" />
+                                </div>
+                                <h3 className="text-lg font-medium text-gray-900">No vehicles available yet</h3>
+                                <p className="text-gray-500 max-w-sm mx-auto mt-2">
+                                    We're currently updating our stock. Please check back later or contact us with your requirements.
+                                </p>
+                            </div>
                         )}
                     </div>
 
