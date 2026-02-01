@@ -24,6 +24,12 @@ export async function GET(
         const contentType = res.headers.get('content-type');
         if (contentType && contentType.includes('application/json')) {
             const data = await res.json();
+
+            // Debug: If upstream returns error, append target URL info
+            if (!res.ok && data.error) {
+                data.error = `${data.error} (Target: ${url})`;
+            }
+
             return NextResponse.json(data, { status: res.status });
         } else {
             const text = await res.text();
