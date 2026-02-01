@@ -21,8 +21,10 @@ export default function HomePage() {
             try {
                 const response = await api.getVehicles(storeSlug, { limit: 8 });
                 setVehicles(response.data || []);
-            } catch (err) {
+            } catch (err: any) {
                 console.error('Failed to fetch vehicles:', err);
+                // Temporary debug: Show error on screen
+                alert(`Debug Error: ${err.message}`);
             } finally {
                 setVehiclesLoading(false);
             }
