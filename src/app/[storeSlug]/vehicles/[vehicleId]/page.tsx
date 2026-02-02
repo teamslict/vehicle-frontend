@@ -9,6 +9,8 @@ import {
 import Link from 'next/link';
 import { use, useEffect, useState } from 'react';
 import { api, VehicleDetail } from '@/lib/api';
+import FavoriteButton from '@/components/vehicles/FavoriteButton';
+import FormattedPrice from '@/components/vehicles/FormattedPrice';
 
 export default function VehicleDetailPage({ params }: { params: Promise<{ storeSlug: string; vehicleId: string }> }) {
     const { storeSlug, vehicleId } = use(params);
@@ -63,15 +65,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
         );
     }
 
-    const formatPrice = (price: number) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: vehicle.currency || 'USD',
-            maximumFractionDigits: 0,
-        }).format(price);
-    };
-
-    const formatMileage = (km: number) => {
+    const formatMileage = (km: number | null | undefined) => {
+        if (km === null || km === undefined) return '—';
         return `${km.toLocaleString()} km`;
     };
 
@@ -139,13 +134,14 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
                                 <h1 className="text-2xl md:text-3xl font-extra-bold text-gray-900 mb-2 leading-tight">
                                     {vehicle.title}
                                 </h1>
-                                <p className="text-gray-500 mb-6 flex items-center gap-2">
-                                    Stock ID: <span className="font-mono text-gray-900 font-bold">{vehicle.stockNumber}</span>
+                                <p className="text-gray-500 mb-6 flex items-center justify-between">
+                                    <span>Stock ID: <span className="font-mono text-gray-900 font-bold">{vehicle.stockNumber}</span></span>
+                                    <FavoriteButton vehicleId={vehicle.id} />
                                 </p>
 
                                 <div className="flex items-end gap-3 mb-8">
                                     <span className="text-4xl font-black text-gray-900 tracking-tight">
-                                        {formatPrice(vehicle.fobPrice)}
+                                        <FormattedPrice amount={vehicle.fobPrice} baseCurrency={vehicle.currency} />
                                     </span>
                                     <span className="text-gray-500 font-medium mb-1.5">(FOB Price)</span>
                                 </div>

@@ -1,7 +1,12 @@
+'use client';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Fuel, Calendar, Gauge, MapPin, Settings } from 'lucide-react';
 import { Vehicle } from '@/lib/api';
+import FavoriteButton from '@/components/vehicles/FavoriteButton';
+import FormattedPrice from '@/components/vehicles/FormattedPrice';
+import { useTranslations } from 'next-intl';
 
 interface VehicleCardProps {
     vehicle?: Vehicle;
@@ -11,6 +16,7 @@ interface VehicleCardProps {
 }
 
 export default function VehicleCard({ vehicle, index, primaryColor, storeSlug }: VehicleCardProps) {
+    const t = useTranslations('Vehicles');
     // If no vehicle data, use mock data (for homepage featured section)
     const displayData = vehicle || {
         id: `demo-${index}`,
@@ -23,14 +29,6 @@ export default function VehicleCard({ vehicle, index, primaryColor, storeSlug }:
         transmission: 'Automatic',
         mainPhoto: null,
         status: 'IN_YARD',
-    };
-
-    const formatPrice = (price: number, currency: string) => {
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: currency || 'USD',
-            maximumFractionDigits: 0,
-        }).format(price);
     };
 
     const formatMileage = (km: number) => {
@@ -61,9 +59,14 @@ export default function VehicleCard({ vehicle, index, primaryColor, storeSlug }:
                     <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                         {displayData.stockNumber}
                     </div>
+                    <div className="absolute top-2 right-2">
+                        <FavoriteButton vehicleId={displayData.id} />
+                    </div>
                     <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/80 to-transparent">
                         <span className="text-white font-bold text-lg">
-                            {formatPrice(displayData.price, displayData.currency)}
+                            {displayData.price > 0 ? (
+                                <FormattedPrice amount={displayData.price} baseCurrency={displayData.currency} />
+                            ) : 'Ask for Price'}
                         </span>
                         <span className="text-white/70 text-xs ml-2">FOB</span>
                     </div>

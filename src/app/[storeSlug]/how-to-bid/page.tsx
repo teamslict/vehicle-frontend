@@ -167,19 +167,22 @@ export default function HowToBidPage() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: index * 0.05 }}
-                                className="step-item"
+                                className="flex gap-6 items-start p-6 rounded-xl hover:bg-gray-50 transition-colors"
                             >
-                                <div className="step-number" style={{ background: primaryColor }}>
+                                <div
+                                    className="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md"
+                                    style={{ background: primaryColor }}
+                                >
                                     {step.step}
                                 </div>
-                                <div className="flex-1">
+                                <div className="flex-1 pt-1">
                                     <div className="flex items-center gap-3 mb-2">
                                         <span style={{ color: primaryColor }}>
-                                            <IconComponent className="w-5 h-5" />
+                                            <IconComponent className="w-6 h-6" />
                                         </span>
-                                        <h3 className="text-xl font-bold">{step.title}</h3>
+                                        <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
                                     </div>
-                                    <p className="text-gray-600">{step.description}</p>
+                                    <p className="text-gray-600 leading-relaxed text-lg">{step.description}</p>
                                 </div>
                             </motion.div>
                         );

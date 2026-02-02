@@ -6,11 +6,57 @@
     "Navigation": {
         "home": "Home",
         "stock": "Stock List",
+        "auctions": "Auctions",
+        "howToBuy": "How to Buy",
         "about": "About Us",
-        "contact": "Contact"
+        "contact": "Contact",
+        "payment": "Payment",
+        "payOnline": "Pay Online",
+        "ourBank": "Our Bank",
+        "allStock": "All Stock",
+        "clearance": "Clearance Sale",
+        "newArrivals": "New Arrivals",
+        "liveAuction": "Live Auction",
+        "howToBid": "How to Bid",
+        "stockVehicle": "Vehicle from Stock",
+        "orderNew": "Order Brand New",
+        "request": "Request for Vehicle",
+        "companyProfile": "Company Profile",
+        "faq": "FAQ",
+        "myAccount": "My Account"
     },
     "Common": {
         "search": "Search",
-        "inquire": "Inquire"
+        "inquire": "Inquire",
+        "japanTime": "Japan Time",
+        "exporter": "Japanese Used Car Exporter"
+    },
+    "About": {
+        "title": "About Us",
+        "ourStory": "Our Story",
+        "founded": "Founded",
+        "employees": "Employees",
+        "values": "Our Values",
+        "contactUs": "Contact Us",
+        "learnMore": "Learn More"
+    },
+    "Vehicles": {
+        "details": "View Details",
+        "stockId": "Stock ID",
+        "mileage": "Mileage",
+        "transmission": "Transmission",
+        "fuel": "Fuel",
+        "price": "Price",
+        "inquireNow": "Inquire Now",
+        "available": "In Stock",
+        "askForPrice": "Ask for Price",
+        "specifications": "Vehicle Specifications"
+    },
+    "Footer": {
+        "tagline": "Premium Japanese used car exporter with a global reach. Quality inspected and reliable shipping.",
+        "quickLinks": "Quick Links",
+        "ourServices": "Our Services",
+        "contactInfo": "Contact Information",
+        "copyright": "All Rights Reserved"
     }
 }

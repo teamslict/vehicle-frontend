@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
-    unoptimized: process.env.NODE_ENV === 'development',
+    unoptimized: true, // Robustness: Force direct browser downloading to bypass server blocks
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {

@@ -4,9 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTenant } from '@/lib/tenant-context';
 import { Facebook, Instagram, Youtube, Phone, Mail, MapPin } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 export default function Footer() {
     const { tenant, storeSlug } = useTenant();
+    const t = useTranslations('Footer');
+    const navT = useTranslations('Navigation');
 
     const shopByMake = [
         'Toyota', 'Nissan', 'Honda', 'Mazda', 'Mitsubishi', 'Subaru',
@@ -24,10 +27,10 @@ export default function Footer() {
     ];
 
     const aboutLinks = [
-        { name: 'Company Profile', href: `/${storeSlug}/about` },
-        { name: 'How to Buy', href: `/${storeSlug}/how-to-buy/stock` },
+        { name: navT('companyProfile'), href: `/${storeSlug}/about` },
+        { name: navT('howToBuy'), href: `/${storeSlug}/how-to-buy/stock` },
         { name: 'Bank Details', href: `/${storeSlug}/payment/bank-details` },
-        { name: 'FAQ', href: `/${storeSlug}/faq` },
+        { name: navT('faq'), href: `/${storeSlug}/faq` },
         { name: 'Terms and Conditions', href: `/${storeSlug}/terms` },
         { name: 'Privacy Policy', href: `/${storeSlug}/privacy` },
     ];
@@ -110,67 +113,56 @@ export default function Footer() {
                                 </span>
                             )}
 
-                            {tenant?.address && (
-                                <p className="text-gray-400 text-sm mb-4 flex items-start gap-2">
-                                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                    {tenant.address}
-                                </p>
-                            )}
+                            <p className="text-gray-400 text-sm mb-6 leading-relaxed max-w-sm">
+                                {t('tagline')}
+                            </p>
 
-                            <div className="space-y-2 text-sm text-gray-400">
+                            <div className="space-y-3 text-sm text-gray-400">
+                                <h5 className="font-bold text-white mb-2 uppercase tracking-wider text-xs opacity-50">{t('contactInfo')}</h5>
+                                {tenant?.address && (
+                                    <p className="flex items-start gap-2">
+                                        <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-primary" />
+                                        {tenant.address}
+                                    </p>
+                                )}
                                 {tenant?.contactPhone && (
-                                    <a href={`tel:${tenant.contactPhone}`} className="flex items-center gap-2 hover:text-white">
-                                        <Phone className="w-4 h-4" />
+                                    <a href={`tel:${tenant.contactPhone}`} className="flex items-center gap-2 hover:text-white transition-colors">
+                                        <Phone className="w-4 h-4 text-primary" />
                                         {tenant.contactPhone}
                                     </a>
                                 )}
                                 {tenant?.contactEmail && (
-                                    <a href={`mailto:${tenant.contactEmail}`} className="flex items-center gap-2 hover:text-white">
-                                        <Mail className="w-4 h-4" />
+                                    <a href={`mailto:${tenant.contactEmail}`} className="flex items-center gap-2 hover:text-white transition-colors">
+                                        <Mail className="w-4 h-4 text-primary" />
                                         {tenant.contactEmail}
                                     </a>
                                 )}
                             </div>
 
                             {/* Social Links */}
-                            <div className="flex gap-3 mt-4">
+                            <div className="flex gap-3 mt-6">
                                 {tenant?.facebookUrl && (
-                                    <a
-                                        href={tenant.facebookUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:opacity-80"
-                                    >
-                                        <Facebook className="w-5 h-5" />
+                                    <a href={tenant.facebookUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 rounded-lg flex items-center justify-center hover:bg-blue-600 transition-all">
+                                        <Facebook className="w-4 h-4" />
                                     </a>
                                 )}
                                 {tenant?.instagramUrl && (
-                                    <a
-                                        href={tenant.instagramUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-500 rounded-full flex items-center justify-center hover:opacity-80"
-                                    >
-                                        <Instagram className="w-5 h-5" />
+                                    <a href={tenant.instagramUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 rounded-lg flex items-center justify-center hover:bg-pink-600 transition-all">
+                                        <Instagram className="w-4 h-4" />
                                     </a>
                                 )}
                                 {tenant?.youtubeUrl && (
-                                    <a
-                                        href={tenant.youtubeUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center hover:opacity-80"
-                                    >
-                                        <Youtube className="w-5 h-5" />
+                                    <a href={tenant.youtubeUrl} target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-white/5 rounded-lg flex items-center justify-center hover:bg-red-600 transition-all">
+                                        <Youtube className="w-4 h-4" />
                                     </a>
                                 )}
                             </div>
                         </div>
 
                         {/* About Links */}
-                        <div>
-                            <h4 className="font-bold text-lg mb-4">About Us</h4>
-                            <ul className="grid grid-cols-2 gap-2 text-sm text-gray-400">
+                        <div className="pt-6 border-t border-white/5">
+                            <h4 className="font-bold text-sm uppercase tracking-widest text-white/40 mb-4">{navT('about')}</h4>
+                            <ul className="grid grid-cols-2 gap-x-8 gap-y-2 text-sm text-gray-400">
                                 {aboutLinks.map((link) => (
                                     <li key={link.name}>
                                         <Link href={link.href} className="hover:text-white transition-colors">
@@ -185,9 +177,9 @@ export default function Footer() {
             </div>
 
             {/* Copyright Bar */}
-            <div className="border-t border-gray-800">
-                <div className="container-custom py-4 text-center text-sm text-gray-500">
-                    © {new Date().getFullYear()} {tenant?.storeName || 'Vehicle Export'}. All rights reserved.
+            <div className="border-t border-white/5">
+                <div className="container-custom py-6 text-center text-xs text-gray-500 font-medium tracking-wide">
+                    © {new Date().getFullYear()} {tenant?.storeName || 'Vehicle Export'}. {t('copyright')}
                 </div>
             </div>
         </footer>

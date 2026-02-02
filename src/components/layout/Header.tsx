@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+
 import Image from 'next/image';
 import { useState } from 'react';
 import { useTenant } from '@/lib/tenant-context';
@@ -10,53 +12,78 @@ import {
     ChevronDown,
     Search,
     User,
-    Phone,
     Globe,
-    Clock,
+    CreditCard,
+    LogOut,
+    ShoppingCart,
+    Phone,
+    Clock
 } from 'lucide-react';
+import { useCurrencyStore } from '@/store/useCurrencyStore';
+import { useTranslations } from 'next-intl';
 
 export default function Header() {
     const { tenant, storeSlug, loading } = useTenant();
+    const router = useRouter();
+    const t = useTranslations('Navigation');
+    const commonT = useTranslations('Common');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+    const { currency, locale, setCurrency, setLocale } = useCurrencyStore();
+    const primaryColor = tenant?.primaryColor || '#c62828';
+
     const navigation = [
         {
-            name: 'Stock List',
+            name: t('stock'),
+            key: 'stock',
             href: `/${storeSlug}/vehicles`,
             dropdown: [
-                { name: 'All Stock', href: `/${storeSlug}/vehicles` },
-                { name: 'Clearance Sale', href: `/${storeSlug}/vehicles?clearance=true` },
-                { name: 'New Arrivals', href: `/${storeSlug}/vehicles?sort=newest` },
+                { name: t('allStock'), href: `/${storeSlug}/vehicles` },
+                { name: t('clearance'), href: `/${storeSlug}/vehicles?clearance=true` },
+                { name: t('newArrivals'), href: `/${storeSlug}/vehicles?sort=newest` },
             ],
         },
         {
-            name: 'Auction',
+            name: t('auctions'),
+            key: 'auctions',
             href: `/${storeSlug}/auctions`,
             dropdown: [
-                { name: 'Live Auction', href: `/${storeSlug}/auctions` },
-                { name: 'How to Bid', href: `/${storeSlug}/how-to-bid` },
+                { name: t('liveAuction'), href: `/${storeSlug}/auctions` },
+                { name: t('howToBid'), href: `/${storeSlug}/how-to-bid` },
             ],
         },
         {
-            name: 'How to Buy',
+            name: t('howToBuy'),
+            key: 'howToBuy',
             href: `/${storeSlug}/how-to-buy/stock`,
             dropdown: [
-                { name: 'Vehicle from Stock', href: `/${storeSlug}/how-to-buy/stock` },
-                { name: 'Order Brand New', href: `/${storeSlug}/how-to-buy/new` },
-                { name: 'Request for Vehicle', href: `/${storeSlug}/request-vehicle` },
+                { name: t('stockVehicle'), href: `/${storeSlug}/how-to-buy/stock` },
+                { name: t('orderNew'), href: `/${storeSlug}/how-to-buy/new` },
+                { name: t('request'), href: `/${storeSlug}/request-vehicle` },
             ],
         },
         {
-            name: 'About Us',
+            name: t('about'),
+            key: 'about',
             href: `/${storeSlug}/about`,
             dropdown: [
-                { name: 'Company Profile', href: `/${storeSlug}/about` },
-                { name: 'FAQ', href: `/${storeSlug}/faq` },
+                { name: t('companyProfile'), href: `/${storeSlug}/about` },
+                { name: t('faq'), href: `/${storeSlug}/faq` },
             ],
         },
         {
-            name: 'Contact',
+            name: t('payment'),
+            key: 'payment',
+            href: `/${storeSlug}/dashboard/wallet`,
+            dropdown: [
+                { name: t('payOnline'), href: `/${storeSlug}/dashboard/wallet` },
+                { name: t('ourBank'), href: `/${storeSlug}/bank-info` },
+            ],
+        },
+        {
+            name: t('contact'),
+            key: 'contact',
             href: `/${storeSlug}/contact`,
         },
     ];
@@ -69,38 +96,79 @@ export default function Header() {
         );
     }
 
-    const primaryColor = tenant?.primaryColor || '#c62828';
-
     return (
         <>
             {/* Top Bar */}
-            <div className="top-bar border-b border-gray-800">
+            <div className="top-bar border-b border-gray-100/10 py-2">
                 <div className="container-custom flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                        <span className="hidden sm:inline opacity-80">Japanese Used Car Exporter</span>
+                        <span className="hidden lg:inline opacity-70 text-xs font-medium tracking-wide uppercase">{commonT('exporter')}</span>
                         {tenant?.contactPhone && (
-                            <a href={`tel:${tenant.contactPhone}`} className="flex items-center gap-1.5 hover:text-gray-300 transition-colors">
-                                <Phone className="w-3.5 h-3.5" />
-                                <span className="font-medium">{tenant.contactPhone}</span>
+                            <a href={`tel:${tenant.contactPhone}`} className="flex items-center gap-1.5 hover:text-white transition-colors group">
+                                <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                                    <Phone className="w-3 h-3" />
+                                </div>
+                                <span className="text-sm font-bold tracking-tight">{tenant.contactPhone}</span>
                             </a>
                         )}
                     </div>
-                    <div className="flex items-center gap-6">
+                    <div className="flex items-center gap-4">
                         {tenant?.showJapanTime && (
-                            <span className="flex items-center gap-1.5 opacity-80">
-                                <Clock className="w-3.5 h-3.5" />
-                                <span className="hidden sm:inline">Japan Time:</span> {new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' })}
-                            </span>
+                            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-lg border border-white/10">
+                                <Clock className="w-3.5 h-3.5 text-primary" />
+                                <span className="text-xs font-bold whitespace-nowrap">
+                                    <span className="opacity-60 font-medium mr-1">{commonT('japanTime')}:</span>
+                                    {new Date().toLocaleTimeString('en-US', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit' })}
+                                </span>
+                            </div>
                         )}
-                        <div className="flex items-center gap-4 border-l border-gray-700 pl-4 ml-2">
-                            <button className="flex items-center gap-1.5 hover:text-white text-gray-300 transition-colors font-medium">
-                                <Globe className="w-3.5 h-3.5" />
-                                USD
-                            </button>
-                            <button className="flex items-center gap-1.5 hover:text-white text-gray-300 transition-colors font-medium">
-                                <Globe className="w-3.5 h-3.5" />
-                                EN
-                            </button>
+
+                        <div className="flex items-center bg-black/20 rounded-lg p-1 border border-white/5 shadow-inner translate-y-[1px]">
+                            {/* Currency Switcher */}
+                            <div className="flex bg-white/5 rounded-md p-0.5">
+                                <button
+                                    onClick={() => setCurrency('USD')}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${currency === 'USD'
+                                        ? 'bg-primary text-white shadow-sm scale-105'
+                                        : 'text-gray-400 hover:text-gray-200'
+                                        }`}
+                                >
+                                    USD
+                                </button>
+                                <button
+                                    onClick={() => setCurrency('JPY')}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${currency === 'JPY'
+                                        ? 'bg-primary text-white shadow-sm scale-105'
+                                        : 'text-gray-400 hover:text-gray-200'
+                                        }`}
+                                >
+                                    JPY
+                                </button>
+                            </div>
+
+                            <div className="w-px h-4 bg-white/10 mx-2" />
+
+                            {/* Language Switcher */}
+                            <div className="flex bg-white/5 rounded-md p-0.5">
+                                <button
+                                    onClick={() => setLocale('en')}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${locale === 'en'
+                                        ? 'bg-indigo-600 text-white shadow-sm scale-105'
+                                        : 'text-gray-400 hover:text-gray-200'
+                                        }`}
+                                >
+                                    EN
+                                </button>
+                                <button
+                                    onClick={() => setLocale('ja')}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${locale === 'ja'
+                                        ? 'bg-indigo-600 text-white shadow-sm scale-105'
+                                        : 'text-gray-400 hover:text-gray-200'
+                                        }`}
+                                >
+                                    日本語
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -181,7 +249,10 @@ export default function Header() {
 
                         {/* Right Actions */}
                         <div className="flex items-center gap-4 ml-auto xl:ml-8">
-                            <button className="p-2.5 hover:bg-gray-100 rounded-full text-gray-600 transition-colors">
+                            <button
+                                onClick={() => router.push(`/${storeSlug}/vehicles`)}
+                                className="p-2.5 hover:bg-gray-100 rounded-full text-gray-600 transition-colors"
+                            >
                                 <Search className="w-5 h-5" />
                             </button>
 
@@ -193,7 +264,7 @@ export default function Header() {
                                     className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 font-semibold text-sm transition-all text-gray-700"
                                 >
                                     <User className="w-4 h-4" />
-                                    My Account
+                                    {t('myAccount')}
                                 </Link>
                                 {/* Dropdown menu */}
                                 <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">

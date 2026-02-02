@@ -1,6 +1,8 @@
 import { TenantProvider } from '@/lib/tenant-context';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages } from 'next-intl/server';
 
 export default async function StoreLayout({
     children,
@@ -11,15 +13,20 @@ export default async function StoreLayout({
 }) {
     const { storeSlug } = await params;
 
+    // Fetch messages for the current locale (handled by next-intl middleware/request config)
+    const messages = await getMessages();
+
     return (
         <TenantProvider storeSlug={storeSlug}>
-            <div className="min-h-screen flex flex-col">
-                <Header />
-                <main className="flex-1">
-                    {children}
-                </main>
-                <Footer />
-            </div>
+            <NextIntlClientProvider messages={messages}>
+                <div className="min-h-screen flex flex-col">
+                    <Header />
+                    <main className="flex-1">
+                        {children}
+                    </main>
+                    <Footer />
+                </div>
+            </NextIntlClientProvider>
         </TenantProvider>
     );
 }

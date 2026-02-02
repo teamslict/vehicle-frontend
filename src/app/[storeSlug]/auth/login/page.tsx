@@ -31,6 +31,9 @@ export default function LoginPage({ params }: { params: Promise<{ storeSlug: str
             // Mock success for now
             await new Promise(resolve => setTimeout(resolve, 1500));
 
+            // Set mock session for auth guard
+            localStorage.setItem('mock_session', 'true');
+
             toast.success('Successfully logged in!');
             router.push(`/${storeSlug}`);
         } catch (error) {

@@ -18,6 +18,8 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
     const [error, setError] = useState<string | null>(null);
     const [total, setTotal] = useState(0);
     const [page, setPage] = useState(1);
+    const [filters, setFilters] = useState<Record<string, string>>({});
+    const [sort, setSort] = useState('newest');
     const limit = 12;
 
     useEffect(() => {
@@ -25,9 +27,50 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
             setLoading(true);
             setError(null);
             try {
+                // Map filters to API params
+                const params: any = { ...filters };
+
+                if (filters.year) {
+                    params.minYear = filters.year;
+                    params.maxYear = filters.year;
+                    delete params.year;
+                }
+
+                if (filters.price) {
+                    if (filters.price === 'Under $10,000') {
+                        params.maxPrice = '10000';
+                    } else if (filters.price === '$10,000 - $20,000') {
+                        params.minPrice = '10000';
+                        params.maxPrice = '20000';
+                    } else if (filters.price === '$20,000 - $30,000') {
+                        params.minPrice = '20000';
+                        params.maxPrice = '30000';
+                    } else if (filters.price === '$30,000+') {
+                        params.minPrice = '30000';
+                    }
+                    delete params.price;
+                }
+
+                if (filters.engineCc) {
+                    if (filters.engineCc === 'Under 1000cc') {
+                        params.maxEngineCc = '1000';
+                    } else if (filters.engineCc === '1000cc - 1500cc') {
+                        params.minEngineCc = '1000';
+                        params.maxEngineCc = '1500';
+                    } else if (filters.engineCc === '1500cc - 2000cc') {
+                        params.minEngineCc = '1500';
+                        params.maxEngineCc = '2000';
+                    } else if (filters.engineCc === 'Over 2000cc') {
+                        params.minEngineCc = '2000';
+                    }
+                    delete params.engineCc;
+                }
+
                 const response = await api.getVehicles(storeSlug, {
                     limit,
                     offset: (page - 1) * limit,
+                    sort,
+                    ...params
                 });
                 setVehicles(response.data || []);
                 setTotal(response.meta?.total || 0);
@@ -40,7 +83,12 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
         };
 
         fetchVehicles();
-    }, [storeSlug, page]);
+    }, [storeSlug, page, filters, sort]);
+
+    const handleFilterChange = (newFilters: Record<string, string>) => {
+        setFilters(newFilters);
+        setPage(1); // Reset to first page when filtering
+    };
 
     const totalPages = Math.ceil(total / limit);
 
@@ -68,12 +116,19 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
 
                         {/* Sort Dropdown */}
                         <div className="relative group">
-                            <select className="appearance-none bg-white border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer font-medium">
-                                <option>Sort by: Newest</option>
-                                <option>Price: Low to High</option>
-                                <option>Price: High to Low</option>
-                                <option>Year: Newest</option>
-                                <option>Mileage: Low to High</option>
+                            <select
+                                value={sort}
+                                onChange={(e) => {
+                                    setSort(e.target.value);
+                                    setPage(1);
+                                }}
+                                className="appearance-none bg-white border border-gray-200 text-gray-700 py-2 pl-4 pr-10 rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary cursor-pointer font-medium"
+                            >
+                                <option value="newest">Sort by: Newest</option>
+                                <option value="price_asc">Price: Low to High</option>
+                                <option value="price_desc">Price: High to Low</option>
+                                <option value="year_desc">Year: Newest</option>
+                                <option value="mileage_asc">Mileage: Low to High</option>
                             </select>
                             <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 pointer-events-none" />
                         </div>
@@ -84,7 +139,7 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
                     {/* Sidebar Filters */}
                     <aside className={`lg:block ${isMobileFiltersOpen ? 'block' : 'hidden'}`}>
                         <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm sticky top-24">
-                            <FilterSidebar />
+                            <FilterSidebar onFilterChange={handleFilterChange} />
                         </div>
                     </aside>
 
@@ -150,8 +205,8 @@ export default function VehiclesPage({ params }: { params: Promise<{ storeSlug: 
                                                     key={p}
                                                     onClick={() => setPage(p)}
                                                     className={`w-10 h-10 flex items-center justify-center rounded-lg font-medium ${page === p
-                                                            ? 'bg-gray-900 text-white'
-                                                            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
+                                                        ? 'bg-gray-900 text-white'
+                                                        : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50'
                                                         }`}
                                                 >
                                                     {p}

@@ -5,9 +5,11 @@ import { useTenant } from '@/lib/tenant-context';
 import { ChevronDown, ChevronRight, Search, Filter, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export function FilterSidebar() {
+export function FilterSidebar({ onFilterChange }: { onFilterChange: (filters: Record<string, string>) => void }) {
     const { tenant } = useTenant();
     const primaryColor = tenant?.primaryColor || '#c62828';
+
+    const [selectedFilters, setSelectedFilters] = useState<Record<string, string>>({});
 
     // Mock data - would typically come from API/Context
     const filters = [
@@ -17,22 +19,42 @@ export function FilterSidebar() {
             options: ['Toyota', 'Honda', 'Nissan', 'Mazda', 'Suzuki', 'Mitsubishi', 'Subaru']
         },
         {
-            id: 'model',
-            label: 'Model',
-            options: ['Prius', 'Aqua', 'Vitz', 'Fit', 'Axio', 'Premio']
-        },
-        {
             id: 'year',
             label: 'Year',
-            options: ['2024', '2023', '2022', '2021', '2020', 'Older']
+            options: ['2025', '2024', '2023', '2022', '2021', '2020']
         },
         {
             id: 'price',
             label: 'Price Range',
-            options: ['Under $5,000', '$5,000 - $10,000', '$10,000 - $20,000', '$20,000+']
+            options: ['Under $10,000', '$10,000 - $20,000', '$20,000 - $30,000', '$30,000+']
         },
         {
-            id: 'body',
+            id: 'steering',
+            label: 'Steering',
+            options: ['RHD', 'LHD']
+        },
+        {
+            id: 'engineCc',
+            label: 'Engine Size',
+            options: ['Under 1000cc', '1000cc - 1500cc', '1500cc - 2000cc', 'Over 2000cc']
+        },
+        {
+            id: 'color',
+            label: 'Exterior Color',
+            options: ['White', 'Black', 'Silver', 'Pearl', 'Blue', 'Red', 'Gray']
+        },
+        {
+            id: 'transmission',
+            label: 'Transmission',
+            options: ['Automatic', 'Manual']
+        },
+        {
+            id: 'fuelType',
+            label: 'Fuel Type',
+            options: ['Gasoline', 'Diesel', 'Hybrid', 'Electric']
+        },
+        {
+            id: 'bodyType',
             label: 'Body Type',
             options: ['Sedan', 'SUV', 'Hatchback', 'Truck', 'Van/Minivan']
         }
@@ -40,14 +62,29 @@ export function FilterSidebar() {
 
     const [openSections, setOpenSections] = useState<Record<string, boolean>>({
         make: true,
-        model: true,
-        year: false,
-        price: false,
-        body: false
+        transmission: true,
+        fuelType: false,
+        bodyType: false
     });
 
     const toggleSection = (id: string) => {
         setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+    };
+
+    const handleOptionChange = (sectionId: string, option: string) => {
+        const newFilters = { ...selectedFilters };
+        if (newFilters[sectionId] === option) {
+            delete newFilters[sectionId];
+        } else {
+            newFilters[sectionId] = option;
+        }
+        setSelectedFilters(newFilters);
+        onFilterChange(newFilters);
+    };
+
+    const clearAll = () => {
+        setSelectedFilters({});
+        onFilterChange({});
     };
 
     return (
@@ -58,7 +95,10 @@ export function FilterSidebar() {
                     <Filter className="w-5 h-5 text-gray-400" />
                     Filters
                 </h3>
-                <button className="text-xs font-semibold text-gray-500 hover:text-red-600 transition-colors">
+                <button
+                    onClick={clearAll}
+                    className="text-xs font-semibold text-gray-500 hover:text-red-600 transition-colors"
+                >
                     Clear All
                 </button>
             </div>
@@ -73,6 +113,11 @@ export function FilterSidebar() {
                         >
                             <span className="font-semibold text-sm text-gray-800 group-hover:text-primary transition-colors">
                                 {section.label}
+                                {selectedFilters[section.id] && (
+                                    <span className="ml-2 text-[10px] bg-red-100 text-red-600 px-1.5 py-0.5 rounded-full">
+                                        Active
+                                    </span>
+                                )}
                             </span>
                             {openSections[section.id] ? (
                                 <ChevronDown className="w-4 h-4 text-gray-400 group-hover:text-primary" />
@@ -96,11 +141,16 @@ export function FilterSidebar() {
                                                 <div className="relative flex items-center">
                                                     <input
                                                         type="checkbox"
+                                                        checked={selectedFilters[section.id] === option}
+                                                        onChange={() => handleOptionChange(section.id, option)}
                                                         className="peer h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/20 transition-all cursor-pointer"
                                                         style={{ color: primaryColor }}
                                                     />
                                                 </div>
-                                                <span className="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">
+                                                <span className={`text-sm transition-colors ${selectedFilters[section.id] === option
+                                                    ? 'text-red-600 font-bold'
+                                                    : 'text-gray-600 group-hover:text-gray-900'
+                                                    }`}>
                                                     {option}
                                                 </span>
                                             </label>

@@ -1,6 +1,8 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+
 import { useTenant } from '@/lib/tenant-context';
 import { Search, ChevronRight, Car, Truck, Shield, Globe, Award, Star, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -11,8 +13,16 @@ import { useEffect, useState } from 'react';
 
 export default function HomePage() {
     const { tenant, storeSlug, loading } = useTenant();
+    const router = useRouter();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [vehiclesLoading, setVehiclesLoading] = useState(true);
+    const [searchFilters, setSearchFilters] = useState({
+        make: '',
+        model: '',
+        year: '',
+        price: '',
+        type: ''
+    });
 
     useEffect(() => {
         const fetchVehicles = async () => {
@@ -69,6 +79,18 @@ export default function HomePage() {
         { icon: Star, title: '4.9/5', subtitle: 'Reviews' },
     ];
 
+
+    const handleSearch = () => {
+        const params = new URLSearchParams();
+        if (searchFilters.make) params.append('make', searchFilters.make);
+        if (searchFilters.model) params.append('model', searchFilters.model);
+        if (searchFilters.year) params.append('minYear', searchFilters.year);
+        if (searchFilters.price) params.append('maxPrice', searchFilters.price);
+        if (searchFilters.type) params.append('bodyType', searchFilters.type);
+
+        router.push(`/${storeSlug}/vehicles?${params.toString()}`);
+    };
+
     return (
         <div className="flex flex-col bg-gray-50 min-h-screen text-gray-900">
             {/* Hero Section */}
@@ -94,39 +116,77 @@ export default function HomePage() {
                         <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Make</label>
-                                <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm">
-                                    <option>All Makes</option>
-                                    <option>Toyota</option>
-                                    <option>Nissan</option>
-                                    <option>Honda</option>
+                                <select
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm"
+                                    value={searchFilters.make}
+                                    onChange={(e) => setSearchFilters({ ...searchFilters, make: e.target.value })}
+                                >
+                                    <option value="">All Makes</option>
+                                    <option value="Toyota">Toyota</option>
+                                    <option value="Nissan">Nissan</option>
+                                    <option value="Honda">Honda</option>
+                                    <option value="Mazda">Mazda</option>
+                                    <option value="BMW">BMW</option>
+                                    <option value="Mercedes">Mercedes</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Model</label>
-                                <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm">
-                                    <option>All Models</option>
+                                <select
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm"
+                                    value={searchFilters.model}
+                                    onChange={(e) => setSearchFilters({ ...searchFilters, model: e.target.value })}
+                                >
+                                    <option value="">All Models</option>
+                                    {/* Populate based on make ideally, but keeping simple for now */}
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Year</label>
-                                <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm">
-                                    <option>From Year</option>
+                                <select
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm"
+                                    value={searchFilters.year}
+                                    onChange={(e) => setSearchFilters({ ...searchFilters, year: e.target.value })}
+                                >
+                                    <option value="">From Year</option>
+                                    {Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map(year => (
+                                        <option key={year} value={year}>{year}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Price</label>
-                                <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm">
-                                    <option>Max Price</option>
+                                <select
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm"
+                                    value={searchFilters.price}
+                                    onChange={(e) => setSearchFilters({ ...searchFilters, price: e.target.value })}
+                                >
+                                    <option value="">Max Price</option>
+                                    <option value="5000">$5,000</option>
+                                    <option value="10000">$10,000</option>
+                                    <option value="20000">$20,000</option>
+                                    <option value="50000">$50,000</option>
+                                    <option value="100000">$100,000</option>
                                 </select>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider pl-1">Type</label>
-                                <select className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm">
-                                    <option>Body Type</option>
+                                <select
+                                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary bg-gray-50 focus:bg-white transition-all outline-none cursor-pointer text-sm"
+                                    value={searchFilters.type}
+                                    onChange={(e) => setSearchFilters({ ...searchFilters, type: e.target.value })}
+                                >
+                                    <option value="">Body Type</option>
+                                    <option value="sedan">Sedan</option>
+                                    <option value="suv">SUV</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="van">Van</option>
+                                    <option value="coupe">Coupe</option>
                                 </select>
                             </div>
                             <div className="flex items-end">
                                 <button
+                                    onClick={handleSearch}
                                     className="w-full btn btn-primary h-[42px] text-sm shadow-sm hover:shadow transition-all"
                                     style={{ background: primaryColor }}
                                 >

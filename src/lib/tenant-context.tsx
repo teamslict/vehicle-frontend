@@ -40,6 +40,35 @@ export interface TenantConfig {
     companyProfile: CompanyProfile | null;
     bankDetails: BankDetails | null;
     faqItems: FAQItem[] | null;
+
+    // About Us (New Structure)
+    aboutUs: AboutUsConfig | null;
+
+    // Contact Page (New Structure)
+    contactPage: ContactPageConfig | null;
+}
+
+export interface ContactPageConfig {
+    title?: string;
+    subtitle?: string;
+    mapUrl?: string;
+    businessHours?: string;
+    // Generic Bank Details
+    bankDetails?: {
+        bankName?: string;
+        accountName?: string;
+        accountNumber?: string;
+        swiftCode?: string;
+        branch?: string;
+        bankAddress?: string;
+    };
+}
+
+export interface AboutUsConfig {
+    story?: string;
+    mission?: string;
+    stats?: Array<{ value: string; label: string; icon: string }>;
+    values?: Array<{ title: string; desc: string }>;
 }
 
 export interface HeroSlide {
@@ -71,6 +100,7 @@ export interface BankDetails {
     swiftCode: string;
     branch?: string;
     iban?: string;
+    bankAddress?: string;
 }
 
 export interface FAQItem {

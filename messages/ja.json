@@ -1,0 +1,59 @@
+{
+    "HomePage": {
+        "title": "車両輸出へようこそ",
+        "subtitle": "日本の中古車輸出における信頼できるパートナー"
+    },
+    "Navigation": {
+        "home": "ホーム",
+        "stock": "在庫リスト",
+        "auctions": "オークション",
+        "howToBuy": "購入方法",
+        "about": "会社概要",
+        "contact": "お問い合わせ",
+        "allStock": "全在庫",
+        "clearance": "クリアランスセール",
+        "newArrivals": "新着車両",
+        "liveAuction": "ライブオークション",
+        "howToBid": "入札方法",
+        "stockVehicle": "在庫から購入",
+        "orderNew": "新車注文",
+        "request": "車両リクエスト",
+        "companyProfile": "会社情報",
+        "faq": "よくある質問",
+        "myAccount": "マイアカウント"
+    },
+    "Common": {
+        "search": "検索",
+        "inquire": "問い合わせ",
+        "japanTime": "日本時間",
+        "exporter": "日本の中古車輸出業者"
+    },
+    "About": {
+        "title": "会社概要",
+        "ourStory": "私たちの物語",
+        "founded": "設立",
+        "employees": "従業員数",
+        "values": "私たちの価値観",
+        "contactUs": "お問い合わせ",
+        "learnMore": "詳細を見る"
+    },
+    "Vehicles": {
+        "details": "詳細を見る",
+        "stockId": "在庫ID",
+        "mileage": "走行距離",
+        "transmission": "トランスミッション",
+        "fuel": "燃料",
+        "price": "価格",
+        "inquireNow": "今すぐ問い合わせる",
+        "available": "在庫あります",
+        "askForPrice": "価格はお問い合わせください",
+        "specifications": "車両仕様"
+    },
+    "Footer": {
+        "tagline": "世界中に展開するプレミアムな日本の中古車輸出業者。品質検査済みで信頼できる配送を提供します。",
+        "quickLinks": "クイックリンク",
+        "ourServices": "サービス",
+        "contactInfo": "連絡先情報",
+        "copyright": "無断複写・転載を禁じます"
+    }
+}

@@ -99,8 +99,13 @@ export const api = {
         offset?: number;
         sort?: string;
         clearance?: boolean;
+        ids?: string[];
     }): Promise<VehicleListResponse> => {
-        const url = buildUrl('vehicles', { subdomain, ...params });
+        const url = buildUrl('vehicles', {
+            subdomain,
+            ...params,
+            ids: params?.ids?.join(',')
+        });
         const res = await fetchWithRetry(url);
         return res.json();
     },

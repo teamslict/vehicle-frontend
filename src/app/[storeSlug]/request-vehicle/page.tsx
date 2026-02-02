@@ -28,9 +28,23 @@ export default function RequestVehiclePage() {
         setSubmitting(true);
 
         try {
-            // TODO: Connect to API
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            toast.success('Request submitted successfully! We will contact you shortly.');
+            const response = await fetch('/api/vehicle-export/requests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    storeSlug,
+                    ...formData
+                }),
+            });
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                throw new Error(result.error || 'Failed to submit request');
+            }
+
+            toast.success(`Request submitted! Ticket #${result.ticketNumber}`);
+
             setFormData({
                 name: '',
                 email: '',
@@ -44,8 +58,9 @@ export default function RequestVehiclePage() {
                 transmission: '',
                 message: '',
             });
-        } catch {
-            toast.error('Failed to submit request. Please try again.');
+        } catch (error: any) {
+            console.error('Submission error:', error);
+            toast.error(error.message || 'Failed to submit request. Please try again.');
         } finally {
             setSubmitting(false);
         }
