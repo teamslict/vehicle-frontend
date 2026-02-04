@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ERP_API_URL = process.env.ERP_API_URL || 'http://localhost:3001';
 
+const ERP_API_KEY = process.env.ERP_API_KEY;
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ path: string[] }> }
@@ -15,7 +17,7 @@ export async function GET(
     try {
         const res = await fetch(url, {
             headers: {
-                'Authorization': request.headers.get('Authorization') || '',
+                'Authorization': request.headers.get('Authorization') || (ERP_API_KEY ? `Bearer ${ERP_API_KEY}` : ''),
                 'Content-Type': 'application/json',
             },
             cache: 'no-store',
@@ -59,7 +61,7 @@ export async function POST(
         const res = await fetch(url, {
             method: 'POST',
             headers: {
-                'Authorization': request.headers.get('Authorization') || '',
+                'Authorization': request.headers.get('Authorization') || (ERP_API_KEY ? `Bearer ${ERP_API_KEY}` : ''),
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(body),

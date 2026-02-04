@@ -20,6 +20,11 @@ export default async function middleware(req: NextRequest) {
     // Remove port if present
     hostname = hostname.split(':')[0];
 
+    // Normalize: remove www.
+    if (hostname.startsWith('www.')) {
+        hostname = hostname.replace('www.', '');
+    }
+
     // Define domains that do path-based routing (no rewrite needed)
     // e.g. localhost, vercel.app
     // On these domains, users access tenants via /subdomain (e.g. localhost:3000/slict)
