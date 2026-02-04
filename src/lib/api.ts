@@ -143,6 +143,52 @@ export const api = {
         const res = await fetchWithRetry(url);
         return res.json();
     },
+
+    // Customer
+    getCustomerDashboard: async (subdomain: string, email: string) => {
+        const url = buildUrl('customer/dashboard', { subdomain, email });
+        const res = await fetchWithRetry(url);
+        return res.json();
+    },
+
+    getCustomerProfile: async (subdomain: string, email: string) => {
+        const url = buildUrl('customer/profile', { subdomain, email });
+        const res = await fetchWithRetry(url);
+        return res.json();
+    },
+
+    updateCustomerProfile: async (data: { subdomain: string; email: string; name?: string; phone?: string; address?: string }) => {
+        const res = await fetchWithRetry(`${API_BASE}/customer/profile`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return res.json();
+    },
+
+    updateCustomerPassword: async (data: { subdomain: string; email: string; currentPassword?: string; newPassword: string }) => {
+        const res = await fetchWithRetry(`${API_BASE}/customer/password`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return res.json();
+    },
+
+    getCustomerBids: async (subdomain: string, email: string) => {
+        const url = buildUrl('customer/bids', { subdomain, email });
+        const res = await fetchWithRetry(url);
+        return res.json();
+    },
+
+    updateCustomerBid: async (data: { subdomain: string; email: string; bidId: string; amount: number; notes?: string }) => {
+        const res = await fetchWithRetry(`${API_BASE}/customer/bids`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return res.json();
+    },
 };
 
 export default api;

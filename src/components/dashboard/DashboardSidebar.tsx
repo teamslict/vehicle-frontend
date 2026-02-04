@@ -20,6 +20,11 @@ export default function DashboardSidebar({ storeSlug, primaryColor }: DashboardS
         { icon: User, label: 'Profile', href: `/${storeSlug}/dashboard/profile` },
     ];
 
+    const handleSignOut = () => {
+        localStorage.removeItem('mock_session');
+        window.location.href = `/${storeSlug}/auth/login`;
+    };
+
     return (
         <div className="w-full lg:w-64 bg-white lg:min-h-[calc(100vh-80px)] border-r border-gray-100 flex-shrink-0">
             <div className="p-6">
@@ -36,8 +41,8 @@ export default function DashboardSidebar({ storeSlug, primaryColor }: DashboardS
                                 key={item.href}
                                 href={item.href}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group relative overflow-hidden ${isActive
-                                        ? 'text-white shadow-sm'
-                                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                                    ? 'text-white shadow-sm'
+                                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                                     }`}
                                 style={isActive ? { backgroundColor: primaryColor } : {}}
                             >
@@ -54,6 +59,7 @@ export default function DashboardSidebar({ storeSlug, primaryColor }: DashboardS
 
             <div className="p-6 border-t border-gray-100 mt-auto">
                 <button
+                    onClick={handleSignOut}
                     className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-red-600 hover:bg-red-50 transition-colors"
                 >
                     <LogOut size={20} />

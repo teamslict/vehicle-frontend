@@ -57,11 +57,11 @@ export default function AboutPage() {
                 <div className="absolute inset-0 bg-black/50 z-10" />
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1560179707-f14e90ef3dab?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-40" />
 
-                <div className="container-custom relative z-20 text-center">
+                <div className="container-custom relative z-20 text-center flex flex-col items-center justify-center">
                     <h1 className="text-4xl md:text-5xl font-bold mb-4 tracking-tight">
                         {profile?.title || t('title')}
                     </h1>
-                    <p className="max-w-2xl mx-auto text-lg text-gray-200 mt-4 opacity-90">
+                    <p className="max-w-2xl mx-auto text-lg text-gray-200 mt-8 px-4 text-center opacity-90">
                         {mission}
                     </p>
                     <div className="w-20 h-1 bg-white/30 mx-auto rounded-full mt-8" />

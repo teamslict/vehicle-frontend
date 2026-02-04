@@ -1,11 +1,11 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion } from 'framer-motion';
-import { useState } from 'react';
 import { toast } from 'sonner';
 import { User, Mail, Phone, MapPin, Lock, Save, Loader2 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 export default function ProfilePage({ params }: { params: Promise<{ storeSlug: string }> }) {
     const { storeSlug } = use(params);
@@ -13,23 +13,54 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
     const primaryColor = tenant?.primaryColor || '#c62828';
 
     const [loading, setLoading] = useState(false);
+    const [passLoading, setPassLoading] = useState(false);
     const [formData, setFormData] = useState({
-        name: 'John Doe',
-        email: 'john@example.com',
-        phone: '+1 234 567 8900',
-        address: '123 Main St, New York, NY 10001',
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+    });
+
+    const [passData, setPassData] = useState({
         currentPassword: '',
         newPassword: '',
         confirmPassword: ''
     });
 
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const email = localStorage.getItem('user_email');
+            if (email) {
+                try {
+                    const data = await api.getCustomerProfile(storeSlug, email);
+                    if (data) {
+                        setFormData({
+                            name: data.name || '',
+                            email: data.email || email,
+                            phone: data.phone || '',
+                            address: data.address || '',
+                        });
+                    }
+                } catch (err) {
+                    console.error('Fetch profile failed:', err);
+                }
+            }
+        };
+        fetchProfile();
+    }, [storeSlug]);
+
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
 
-        // Simulate API call
         try {
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await api.updateCustomerProfile({
+                subdomain: storeSlug,
+                email: formData.email,
+                name: formData.name,
+                phone: formData.phone,
+                address: formData.address
+            });
             toast.success('Profile updated successfully');
         } catch (error) {
             toast.error('Failed to update profile');
@@ -38,8 +69,38 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
         }
     };
 
+    const handleUpdatePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (passData.newPassword !== passData.confirmPassword) {
+            return toast.error('Passwords do not match');
+        }
+        if (passData.newPassword.length < 6) {
+            return toast.error('Password must be at least 6 characters');
+        }
+
+        setPassLoading(true);
+        try {
+            const res = await api.updateCustomerPassword({
+                subdomain: storeSlug,
+                email: formData.email,
+                currentPassword: passData.currentPassword,
+                newPassword: passData.newPassword
+            });
+            if (res.error) {
+                toast.error(res.error);
+            } else {
+                toast.success('Password updated successfully');
+                setPassData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            }
+        } catch (error) {
+            toast.error('Failed to update password');
+        } finally {
+            setPassLoading(false);
+        }
+    };
+
     return (
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-4xl mx-auto pb-12">
             <div className="mb-8">
                 <h1 className="text-2xl font-bold text-gray-900">Account Settings</h1>
                 <p className="text-gray-500">Manage your personal information and security</p>
@@ -71,6 +132,7 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
                                         <input
                                             type="text"
                                             value={formData.name}
+                                            required
                                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             className="block w-full pl-10 border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm py-2.5"
                                         />
@@ -90,7 +152,7 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
                                             className="block w-full pl-10 border-gray-200 bg-gray-50 text-gray-500 rounded-lg sm:text-sm py-2.5 cursor-not-allowed"
                                         />
                                     </div>
-                                    <p className="mt-1 text-xs text-gray-400">Email cannot be changed contact support.</p>
+                                    <p className="mt-1 text-xs text-gray-400">Email cannot be changed.</p>
                                 </div>
 
                                 <div>
@@ -154,21 +216,27 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
                     </div>
 
                     <div className="p-6">
-                        <form className="space-y-6">
+                        <form onSubmit={handleUpdatePassword} className="space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
                                     <input
                                         type="password"
+                                        value={passData.currentPassword}
+                                        onChange={e => setPassData({ ...passData, currentPassword: e.target.value })}
                                         className="block w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm py-2.5"
                                         placeholder="••••••••"
                                     />
+                                    <p className="mt-1 text-[10px] text-gray-400">Optional if first time</p>
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">New Password</label>
                                     <input
                                         type="password"
+                                        required
+                                        value={passData.newPassword}
+                                        onChange={e => setPassData({ ...passData, newPassword: e.target.value })}
                                         className="block w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm py-2.5"
                                         placeholder="••••••••"
                                     />
@@ -178,6 +246,9 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
                                     <input
                                         type="password"
+                                        required
+                                        value={passData.confirmPassword}
+                                        onChange={e => setPassData({ ...passData, confirmPassword: e.target.value })}
                                         className="block w-full border-gray-300 rounded-lg focus:ring-primary focus:border-primary sm:text-sm py-2.5"
                                         placeholder="••••••••"
                                     />
@@ -186,9 +257,11 @@ export default function ProfilePage({ params }: { params: Promise<{ storeSlug: s
 
                             <div className="flex justify-end pt-2">
                                 <button
-                                    type="button"
-                                    className="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors"
+                                    type="submit"
+                                    disabled={passLoading}
+                                    className="px-6 py-2.5 rounded-lg border border-gray-200 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors flex items-center gap-2"
                                 >
+                                    {passLoading && <Loader2 className="animate-spin" size={16} />}
                                     Update Password
                                 </button>
                             </div>

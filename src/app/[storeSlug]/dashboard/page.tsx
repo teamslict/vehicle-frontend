@@ -1,21 +1,50 @@
 'use client';
 
-import { use } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import { motion } from 'framer-motion';
 import { Gavel, ShoppingCart, Clock, CheckCircle2 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 export default function DashboardOverview({ params }: { params: Promise<{ storeSlug: string }> }) {
     const { storeSlug } = use(params);
     const { tenant } = useTenant();
     const primaryColor = tenant?.primaryColor || '#c62828';
 
-    // Mock Data
+    const [statsData, setStatsData] = useState({
+        activeBids: 0,
+        pendingOrders: 0,
+        watchlist: 0,
+        completed: 0
+    });
+    const [recentActivity, setRecentActivity] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchDashboard = async () => {
+            const email = localStorage.getItem('user_email');
+            if (email) {
+                try {
+                    const data = await api.getCustomerDashboard(storeSlug, email);
+                    if (data && data.stats) {
+                        setStatsData(data.stats);
+                        setRecentActivity(data.recentActivity || []);
+                    }
+                } catch (error) {
+                    console.error('Failed to load dashboard:', error);
+                }
+            }
+            setLoading(false);
+        };
+
+        fetchDashboard();
+    }, [storeSlug]);
+
     const stats = [
-        { label: 'Active Bids', value: '3', icon: Gavel, color: 'text-blue-600', bg: 'bg-blue-50' },
-        { label: 'Pending Orders', value: '1', icon: ShoppingCart, color: 'text-orange-600', bg: 'bg-orange-50' },
-        { label: 'Watchlist', value: '12', icon: Clock, color: 'text-purple-600', bg: 'bg-purple-50' },
-        { label: 'Completed', value: '5', icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50' },
+        { label: 'Active Bids', value: statsData.activeBids, icon: Gavel, color: 'text-blue-600', bg: 'bg-blue-50' },
+        { label: 'Pending Orders', value: statsData.pendingOrders, icon: ShoppingCart, color: 'text-orange-600', bg: 'bg-orange-50' },
+        { label: 'Watchlist', value: statsData.watchlist, icon: Clock, color: 'text-purple-600', bg: 'bg-purple-50' },
+        { label: 'Completed', value: statsData.completed, icon: CheckCircle2, color: 'text-green-600', bg: 'bg-green-50' },
     ];
 
     return (
@@ -27,10 +56,10 @@ export default function DashboardOverview({ params }: { params: Promise<{ storeS
             >
                 <div>
                     <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-                    <p className="text-gray-500">Welcome back, User</p>
+                    <p className="text-gray-500">Welcome back</p>
                 </div>
                 <div className="text-sm text-gray-400">
-                    Last login: Today, 3:45 PM
+                    Last login: Today, {new Date().toLocaleTimeString()}
                 </div>
             </motion.div>
 
@@ -48,7 +77,9 @@ export default function DashboardOverview({ params }: { params: Promise<{ storeS
                             <div className={`p-3 rounded-lg ${stat.bg}`}>
                                 <stat.icon className={`w-6 h-6 ${stat.color}`} />
                             </div>
-                            <span className="text-2xl font-bold text-gray-900">{stat.value}</span>
+                            <span className="text-2xl font-bold text-gray-900">
+                                {loading ? '-' : stat.value}
+                            </span>
                         </div>
                         <h3 className="text-gray-500 font-medium text-sm">{stat.label}</h3>
                     </motion.div>
@@ -64,16 +95,26 @@ export default function DashboardOverview({ params }: { params: Promise<{ storeS
             >
                 <h2 className="text-lg font-bold text-gray-900 mb-6">Recent Activity</h2>
                 <div className="space-y-6">
-                    {/* Placeholder Activity Items */}
-                    {[1, 2, 3].map((item) => (
-                        <div key={item} className="flex items-start gap-4 pb-6 border-b border-gray-50 last:border-0 last:pb-0">
-                            <div className="w-2 h-2 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }} />
-                            <div>
-                                <p className="text-gray-900 font-medium text-sm">Placed a bid on <span className="font-bold">2019 Toyota Prius</span></p>
-                                <p className="text-gray-500 text-xs mt-1">2 hours ago</p>
+                    {loading ? (
+                        <p className="text-gray-400 text-sm">Loading activity...</p>
+                    ) : recentActivity.length > 0 ? (
+                        recentActivity.map((item: any, idx: number) => (
+                            <div key={idx} className="flex items-start gap-4 pb-6 border-b border-gray-50 last:border-0 last:pb-0">
+                                <div className="w-2 h-2 mt-2 rounded-full flex-shrink-0" style={{ backgroundColor: primaryColor }} />
+                                <div>
+                                    <p className="text-gray-900 font-medium text-sm">
+                                        {item.status === 'PENDING' ? 'Placed a bid on ' : 'Update on '}
+                                        <span className="font-bold">{item.vehicle}</span>
+                                    </p>
+                                    <p className="text-gray-500 text-xs mt-1">
+                                        {new Date(item.date).toLocaleDateString()}
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
+                        ))
+                    ) : (
+                        <p className="text-gray-400 text-sm italic">No recent activity found.</p>
+                    )}
                 </div>
             </motion.div>
         </div>

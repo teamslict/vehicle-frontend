@@ -33,6 +33,7 @@ export default function LoginPage({ params }: { params: Promise<{ storeSlug: str
 
             // Set mock session for auth guard
             localStorage.setItem('mock_session', 'true');
+            localStorage.setItem('user_email', formData.email);
 
             toast.success('Successfully logged in!');
             router.push(`/${storeSlug}`);
