@@ -11,6 +11,7 @@ import { use, useEffect, useState } from 'react';
 import { api, VehicleDetail } from '@/lib/api';
 import FavoriteButton from '@/components/vehicles/FavoriteButton';
 import FormattedPrice from '@/components/vehicles/FormattedPrice';
+import ShippingAndQuote from '@/components/vehicles/ShippingAndQuote';
 
 export default function VehicleDetailPage({ params }: { params: Promise<{ storeSlug: string; vehicleId: string }> }) {
     const { storeSlug, vehicleId } = use(params);
@@ -146,21 +147,11 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
                                     <span className="text-gray-500 font-medium mb-1.5">(FOB Price)</span>
                                 </div>
 
-                                <div className="space-y-3">
-                                    <Link
-                                        href={`/${storeSlug}/request-vehicle?stock=${vehicle.stockNumber}`}
-                                        className="btn btn-primary w-full text-lg h-14"
-                                        style={{ background: primaryColor }}
-                                    >
-                                        <Mail className="mr-2" />
-                                        Inquire Now
-                                    </Link>
-                                    <p className="text-xs text-center text-gray-500">
-                                        Inquire for Total C&F Price to your port
-                                    </p>
-                                </div>
                             </div>
                         </div>
+
+                        {/* Shipping & Quote Calculator */}
+                        <ShippingAndQuote vehicleId={vehicle.id} fobPrice={vehicle.fobPrice} />
 
                         {/* Specs Card */}
                         <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">

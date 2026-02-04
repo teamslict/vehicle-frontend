@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const ERP_API_URL = process.env.ERP_API_URL || 'http://localhost:3001';
+const ERP_API_URL = process.env.ERP_API_URL || 'http://localhost:3000';
 
 const ERP_API_KEY = process.env.ERP_API_KEY;
 
@@ -58,6 +58,7 @@ export async function POST(
     const url = `${ERP_API_URL}/api/public/export/${apiPath}`;
 
     try {
+        console.log(`Proxying POST to: ${url}`);
         const res = await fetch(url, {
             method: 'POST',
             headers: {
@@ -67,8 +68,15 @@ export async function POST(
             body: JSON.stringify(body),
         });
 
-        const data = await res.json();
-        return NextResponse.json(data, { status: res.status });
+        console.log(`Upstream response: ${res.status} ${res.statusText}`);
+        const text = await res.text();
+        try {
+            const data = JSON.parse(text);
+            return NextResponse.json(data, { status: res.status });
+        } catch (e) {
+            console.error("Non-JSON Response from ERP:", text.slice(0, 500));
+            return NextResponse.json({ error: "Upstream returned non-JSON", body: text.slice(0, 200) }, { status: 502 });
+        }
     } catch (error) {
         console.error('ERP API Error:', error);
         return NextResponse.json({ error: 'Failed to fetch from ERP' }, { status: 500 });

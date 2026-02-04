@@ -189,6 +189,47 @@ export const api = {
         });
         return res.json();
     },
+
+    // Shipping & Quotes
+    getShippingCountries: async (subdomain: string) => {
+        const url = buildUrl('shipping/countries', { subdomain });
+        const res = await fetchWithRetry(url);
+        return res.json();
+    },
+
+    getShippingPorts: async (subdomain: string, countryId: string) => {
+        const url = buildUrl('shipping/ports', { subdomain, countryId });
+        const res = await fetchWithRetry(url);
+        return res.json();
+    },
+
+    calculateShipping: async (data: { subdomain: string; vehicleId: string; portId: string }) => {
+        const res = await fetchWithRetry(`${API_BASE}/shipping/calculate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return res.json();
+    },
+
+    submitQuote: async (data: {
+        subdomain: string;
+        vehicleId: string;
+        name: string;
+        email: string;
+        phone: string;
+        address?: string;
+        countryId: string;
+        portId: string;
+        customerId?: string;
+    }) => {
+        const res = await fetchWithRetry(`${API_BASE}/quote`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+        });
+        return res.json();
+    },
 };
 
 export default api;
