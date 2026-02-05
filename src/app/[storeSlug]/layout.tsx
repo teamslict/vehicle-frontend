@@ -31,4 +31,40 @@ export default async function StoreLayout({
             </NextIntlClientProvider>
         </TenantProvider>
     );
+
+}
+
+const ERP_API_URL = process.env.ERP_API_URL || 'http://localhost:3000';
+
+export async function generateMetadata({ params }: { params: Promise<{ storeSlug: string }> }) {
+    const { storeSlug } = await params;
+
+    try {
+        // Fetch tenant config directly from ERP backend to avoid extra hops/window issues
+        const res = await fetch(`${ERP_API_URL}/api/public/export/config?subdomain=${storeSlug}`, {
+            next: { revalidate: 60 } // Cache for 1 minute
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            if (data?.logoUrl) {
+                return {
+                    title: data.storeName || 'Vehicle Store',
+                    description: data.tagline || 'Premium Japanese Vehicles',
+                    icons: {
+                        icon: data.logoUrl,
+                        shortcut: data.logoUrl,
+                        apple: data.logoUrl,
+                    }
+                };
+            }
+        }
+    } catch (e) {
+        console.error('Failed to fetch tenant metadata:', e);
+    }
+
+    return {
+        title: 'Vehicle Store',
+        description: 'Premium Imported Vehicles'
+    };
 }

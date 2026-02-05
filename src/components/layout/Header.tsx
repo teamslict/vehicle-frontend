@@ -218,9 +218,9 @@ export default function Header() {
                                 <Image
                                     src={tenant.logoUrl}
                                     alt={tenant.storeName || 'Logo'}
-                                    width={140}
-                                    height={48}
-                                    className="h-12 w-auto object-contain"
+                                    width={200}
+                                    height={64}
+                                    className="h-16 w-auto object-contain"
                                 />
                             ) : (
                                 <span
