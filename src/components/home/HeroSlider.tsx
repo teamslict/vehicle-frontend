@@ -47,7 +47,8 @@ export default function HeroSlider({ slides, storeSlug, storeName, primaryColor 
     const prevSlide = () => setCurrent((prev) => (prev - 1 + slides.length) % slides.length);
 
     return (
-        <div className="relative h-[500px] md:h-[600px] overflow-hidden bg-gray-900">
+
+        <div className="relative h-[60vh] md:h-auto md:aspect-[21/9] overflow-hidden bg-gray-900">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={current}
@@ -62,8 +63,9 @@ export default function HeroSlider({ slides, storeSlug, storeName, primaryColor 
                             src={activeSlide.imageUrl}
                             alt={activeSlide.title}
                             fill
-                            className="object-cover"
+                            className="object-cover object-center"
                             priority
+                            sizes="100vw"
                         />
                     ) : (
                         <div
