@@ -56,6 +56,19 @@ export default function VehicleCard({ vehicle, index, primaryColor, storeSlug }:
                             <span className="text-4xl font-light text-gray-400">🚗</span>
                         </div>
                     )}
+
+                    {/* Status Watermark */}
+                    {(displayData.status === 'SOLD' || displayData.status === 'RESERVED' || displayData.status === 'HOLD') && (
+                        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                            <div className={`transform -rotate-12 px-8 py-3 border-4 text-3xl font-black uppercase tracking-widest opacity-90 backdrop-blur-sm shadow-xl ${displayData.status === 'SOLD'
+                                    ? "border-red-600/80 text-red-600 bg-red-100/80"
+                                    : "border-orange-500/80 text-orange-500 bg-orange-100/80"
+                                }`}>
+                                {displayData.status}
+                            </div>
+                        </div>
+                    )}
+
                     <div className="absolute top-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
                         {displayData.stockNumber}
                     </div>

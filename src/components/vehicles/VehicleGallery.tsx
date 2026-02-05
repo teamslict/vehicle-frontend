@@ -2,16 +2,18 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Download, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 
 interface VehicleGalleryProps {
     images: string[];
     primaryColor: string;
+    stockNumber?: string;
 }
 
-export default function VehicleGallery({ images, primaryColor }: VehicleGalleryProps) {
+export default function VehicleGallery({ images, primaryColor, stockNumber }: VehicleGalleryProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const nextImage = () => {
         setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -19,6 +21,38 @@ export default function VehicleGallery({ images, primaryColor }: VehicleGalleryP
 
     const prevImage = () => {
         setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+    };
+
+    const downloadAllImages = async () => {
+        if (!images.length) return;
+        setIsDownloading(true);
+
+        try {
+            const response = await fetch('/api/download-images', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images, stockNumber }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error || 'Download failed');
+            }
+
+            const blob = await response.blob();
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${stockNumber || 'vehicle'}-pictures.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Failed to download images. Please try again later.');
+        } finally {
+            setIsDownloading(false);
+        }
     };
 
     return (
@@ -96,6 +130,20 @@ export default function VehicleGallery({ images, primaryColor }: VehicleGalleryP
                     </button>
                 ))}
             </div>
+
+            {/* Download Button */}
+            <button
+                onClick={downloadAllImages}
+                disabled={isDownloading || images.length === 0}
+                className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold rounded-lg transition-all shadow-md active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed uppercase text-sm tracking-wide mt-4"
+            >
+                {isDownloading ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                    <Download className="w-5 h-5" />
+                )}
+                {isDownloading ? 'Preparing ZIP...' : 'Download all pictures'}
+            </button>
         </div>
     );
 }

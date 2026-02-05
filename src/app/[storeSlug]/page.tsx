@@ -105,6 +105,24 @@ export default function HomePage() {
                 </div>
             </section>
 
+            {/* Promotional Banner */}
+            {tenant?.promoBanners?.[0]?.imageUrl && (
+                <section className="pb-2">
+                    <div className="container-custom">
+                        <Link
+                            href={tenant.promoBanners[0].link || '#'}
+                            className={`block relative w-full aspect-[21/5] md:aspect-[21/3] rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all ${!tenant.promoBanners[0].link ? 'cursor-default' : ''}`}
+                        >
+                            <img
+                                src={tenant.promoBanners[0].imageUrl}
+                                alt="Promotional Banner"
+                                className="w-full h-full object-cover"
+                            />
+                        </Link>
+                    </div>
+                </section>
+            )}
+
             {/* Search Section (Standardized) */}
             <section className="py-4">
                 <div className="container-custom">

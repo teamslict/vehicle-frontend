@@ -1,6 +1,7 @@
 import { TenantProvider } from '@/lib/tenant-context';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import WhatsAppContact from '@/components/layout/WhatsAppContact';
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 
@@ -25,6 +26,7 @@ export default async function StoreLayout({
                         {children}
                     </main>
                     <Footer />
+                    <WhatsAppContact />
                 </div>
             </NextIntlClientProvider>
         </TenantProvider>

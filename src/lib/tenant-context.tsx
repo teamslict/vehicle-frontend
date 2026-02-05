@@ -25,6 +25,12 @@ export interface TenantConfig {
     heroSlides: HeroSlide[];
     noticeBarText: string | null;
     noticeBarEnabled: boolean;
+    promoBanners?: Array<{
+        id: string;
+        imageUrl: string;
+        link?: string;
+        bgColor?: string;
+    }>;
 
     // Settings
     requireDeposit: boolean;

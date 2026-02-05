@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTenant } from '@/lib/tenant-context';
 import {
     Menu,
@@ -21,6 +21,13 @@ import {
 } from 'lucide-react';
 import { useCurrencyStore } from '@/store/useCurrencyStore';
 import { useTranslations } from 'next-intl';
+import GoogleTranslate, { changeLanguage } from '@/components/GoogleTranslate';
+
+declare global {
+    interface Window {
+        changeGoogleLanguage: (lang: string) => void;
+    }
+}
 
 export default function Header() {
     const { tenant, storeSlug, loading } = useTenant();
@@ -29,9 +36,15 @@ export default function Header() {
     const commonT = useTranslations('Common');
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+    const [currentLang, setCurrentLang] = useState('en');
 
-    const { currency, locale, setCurrency, setLocale } = useCurrencyStore();
+    const { currency, locale, setCurrency, setLocale, fetchRate } = useCurrencyStore();
     const primaryColor = tenant?.primaryColor || '#c62828';
+
+    // Fetch latest exchange rate on mount
+    useEffect(() => {
+        fetchRate();
+    }, [fetchRate]);
 
     const navigation = [
         {
@@ -151,19 +164,25 @@ export default function Header() {
                             {/* Language Switcher */}
                             <div className="flex bg-white/5 rounded-md p-0.5">
                                 <button
-                                    onClick={() => setLocale('en')}
-                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${locale === 'en'
+                                    onClick={() => {
+                                        setCurrentLang('en');
+                                        changeLanguage('en');
+                                    }}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${currentLang === 'en'
                                         ? 'bg-indigo-600 text-white shadow-sm scale-105'
-                                        : 'text-gray-400 hover:text-gray-200'
+                                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/10'
                                         }`}
                                 >
                                     EN
                                 </button>
                                 <button
-                                    onClick={() => setLocale('ja')}
-                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${locale === 'ja'
+                                    onClick={() => {
+                                        setCurrentLang('ja');
+                                        changeLanguage('ja');
+                                    }}
+                                    className={`px-3 py-1 rounded-sm text-[10px] font-bold transition-all ${currentLang === 'ja'
                                         ? 'bg-indigo-600 text-white shadow-sm scale-105'
-                                        : 'text-gray-400 hover:text-gray-200'
+                                        : 'text-gray-400 hover:text-gray-200 hover:bg-white/10'
                                         }`}
                                 >
                                     日本語
@@ -172,6 +191,12 @@ export default function Header() {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Google Translate Integration */}
+            <div className="absolute top-0 left-0 w-px h-px overflow-hidden opacity-0 pointer-events-none">
+                {/* @ts-ignore */}
+                <GoogleTranslate />
             </div>
 
             {/* Notice Bar */}

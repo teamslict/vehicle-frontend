@@ -2,12 +2,13 @@
 
 import { useTenant } from '@/lib/tenant-context';
 import VehicleGallery from '@/components/vehicles/VehicleGallery';
+import ShareMenu from '@/components/vehicles/ShareMenu';
 import {
-    Calendar, Gauge, Fuel, MapPin, Share2, Printer,
+    Calendar, Gauge, Fuel, MapPin, Printer,
     CheckCircle2, Info, ShieldCheck, Mail, Loader2, AlertCircle
 } from 'lucide-react';
 import Link from 'next/link';
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useState, useMemo } from 'react';
 import { api, VehicleDetail } from '@/lib/api';
 import FavoriteButton from '@/components/vehicles/FavoriteButton';
 import FormattedPrice from '@/components/vehicles/FormattedPrice';
@@ -21,6 +22,8 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
     const [vehicle, setVehicle] = useState<VehicleDetail | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    const vehicleUrl = typeof window !== 'undefined' ? window.location.href : '';
 
     useEffect(() => {
         const fetchVehicle = async () => {
@@ -86,9 +89,7 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
                         <span className="text-gray-900 font-medium truncate max-w-[200px]">{vehicle.title}</span>
                     </div>
                     <div className="flex items-center gap-3">
-                        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                            <Share2 size={16} /> Share
-                        </button>
+                        <ShareMenu title={vehicle.title} url={vehicleUrl} />
                         <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
                             <Printer size={16} /> Print
                         </button>
@@ -98,7 +99,11 @@ export default function VehicleDetailPage({ params }: { params: Promise<{ storeS
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
                     {/* Left Column: Gallery & basic info (7 cols) */}
                     <div className="lg:col-span-7 space-y-8">
-                        <VehicleGallery images={images} primaryColor={primaryColor} />
+                        <VehicleGallery
+                            images={images}
+                            primaryColor={primaryColor}
+                            stockNumber={vehicle.stockNumber}
+                        />
 
                         {/* Description / Features */}
                         <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm">
