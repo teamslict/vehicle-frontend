@@ -37,9 +37,37 @@ export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [currentLang, setCurrentLang] = useState('en');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [mounted, setMounted] = useState(false);
 
     const { currency, locale, setCurrency, setLocale, fetchRate } = useCurrencyStore();
     const primaryColor = tenant?.primaryColor || '#c62828';
+
+    // Mark component as mounted (client-side only)
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Check auth state on mount and when localStorage changes
+    useEffect(() => {
+        if (!mounted) return;
+
+        const checkAuth = () => {
+            const session = localStorage.getItem('mock_session');
+            console.log('[Header] Checking auth, session:', session);
+            setIsLoggedIn(!!session);
+        };
+        checkAuth();
+
+        // Listen for storage changes (e.g., sign-out in another tab)
+        window.addEventListener('storage', checkAuth);
+        // Listen for custom auth-change event (same tab)
+        window.addEventListener('auth-change', checkAuth);
+        return () => {
+            window.removeEventListener('storage', checkAuth);
+            window.removeEventListener('auth-change', checkAuth);
+        };
+    }, [mounted]);
 
     // Fetch latest exchange rate on mount
     useEffect(() => {
@@ -283,42 +311,69 @@ export default function Header() {
 
                             {/* TODO: Replace with auth state check */}
                             {/* When logged in, show My Account dropdown */}
-                            <div className="relative group hidden sm:block">
-                                <Link
-                                    href={`/${storeSlug}/dashboard`}
-                                    className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 font-semibold text-sm transition-all text-gray-700"
-                                >
+                            {!mounted ? (
+                                // Skeleton during SSR/hydration
+                                <div className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 font-semibold text-sm text-gray-300 animate-pulse">
                                     <User className="w-4 h-4" />
-                                    {t('myAccount')}
-                                </Link>
-                                {/* Dropdown menu */}
-                                <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                                    <div className="bg-white shadow-xl rounded-xl py-2 border border-gray-100">
-                                        <Link href={`/${storeSlug}/dashboard`} className="block px-4 py-2 text-sm hover:bg-gray-50">
-                                            Dashboard
-                                        </Link>
-                                        <Link href={`/${storeSlug}/dashboard/profile`} className="block px-4 py-2 text-sm hover:bg-gray-50">
-                                            Profile Settings
-                                        </Link>
-                                        <Link href={`/${storeSlug}/dashboard/bids`} className="block px-4 py-2 text-sm hover:bg-gray-50">
-                                            My Bids
-                                        </Link>
-                                        <Link href={`/${storeSlug}/dashboard/favorites`} className="block px-4 py-2 text-sm hover:bg-gray-50">
-                                            Favorites
-                                        </Link>
-                                        <hr className="my-2" />
-                                        <button
-                                            onClick={() => {
-                                                localStorage.removeItem('mock_session');
-                                                window.location.href = `/${storeSlug}/auth/login`;
-                                            }}
-                                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                                        >
-                                            Sign Out
-                                        </button>
+                                    <span className="w-16 h-4 bg-gray-200 rounded" />
+                                </div>
+                            ) : isLoggedIn ? (
+                                <div className="relative group hidden sm:block">
+                                    <Link
+                                        href={`/${storeSlug}/dashboard`}
+                                        className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 font-semibold text-sm transition-all text-gray-700"
+                                    >
+                                        <User className="w-4 h-4" />
+                                        {t('myAccount')}
+                                    </Link>
+                                    {/* Dropdown menu */}
+                                    <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                                        <div className="bg-white shadow-xl rounded-xl py-2 border border-gray-100">
+                                            <Link href={`/${storeSlug}/dashboard`} className="block px-4 py-2 text-sm hover:bg-gray-50">
+                                                Dashboard
+                                            </Link>
+                                            <Link href={`/${storeSlug}/dashboard/profile`} className="block px-4 py-2 text-sm hover:bg-gray-50">
+                                                Profile Settings
+                                            </Link>
+                                            <Link href={`/${storeSlug}/dashboard/bids`} className="block px-4 py-2 text-sm hover:bg-gray-50">
+                                                My Bids
+                                            </Link>
+                                            <Link href={`/${storeSlug}/dashboard/favorites`} className="block px-4 py-2 text-sm hover:bg-gray-50">
+                                                Favorites
+                                            </Link>
+                                            <hr className="my-2" />
+                                            <button
+                                                onClick={() => {
+                                                    localStorage.removeItem('mock_session');
+                                                    setIsLoggedIn(false);
+                                                    window.dispatchEvent(new Event('auth-change'));
+                                                    window.location.href = `/${storeSlug}/auth/login`;
+                                                }}
+                                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                                            >
+                                                Sign Out
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            ) : (
+                                <>
+                                    <Link
+                                        href={`/${storeSlug}/auth/login`}
+                                        className="hidden sm:flex items-center gap-2 px-5 py-2.5 rounded-full border border-gray-200 hover:border-gray-300 hover:bg-gray-50 font-semibold text-sm transition-all text-gray-700"
+                                    >
+                                        <User className="w-4 h-4" />
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        href={`/${storeSlug}/auth/register`}
+                                        className="hidden sm:block px-5 py-2.5 rounded-full font-semibold text-sm text-white shadow-lg transition-all hover:opacity-90"
+                                        style={{ background: primaryColor }}
+                                    >
+                                        Register Free
+                                    </Link>
+                                </>
+                            )}
 
                             {/* When logged out, show Sign In / Register */}
                             {/*

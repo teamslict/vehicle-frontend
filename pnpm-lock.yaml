@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  clsx:
+    specifier: ^2.1.1
+    version: 2.1.1
   framer-motion:
     specifier: ^12.29.2
     version: 12.29.2(react-dom@19.2.3)(react@19.2.3)
@@ -35,6 +38,9 @@ dependencies:
   swr:
     specifier: ^2.3.8
     version: 2.3.8(react@19.2.3)
+  tailwind-merge:
+    specifier: ^3.4.0
+    version: 3.4.0
   zustand:
     specifier: ^5.0.10
     version: 5.0.10(@types/react@19.2.10)(react@19.2.3)
@@ -1764,6 +1770,11 @@ packages:
 
   /client-only@0.0.1:
     resolution: {integrity: sha512-IV3Ou0jSMzZrd3pZ48nLkT9DA7Ag1pnPzaiQhpW7c3RbcqqzvzzVu+L8gfqMp/8IM2MQtSiqaCxrrcfu8I8rMA==}
+    dev: false
+
+  /clsx@2.1.1:
+    resolution: {integrity: sha512-eYm0QWBtUrBWZWG0d386OGAw16Z995PiOVo2B7bjWSbHedGl5e0ZWaq65kOGgUSNesEIDkB9ISbTg/JK9dhCZA==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert@2.0.1:
@@ -3887,6 +3898,10 @@ packages:
       dequal: 2.0.3
       react: 19.2.3
       use-sync-external-store: 1.6.0(react@19.2.3)
+    dev: false
+
+  /tailwind-merge@3.4.0:
+    resolution: {integrity: sha512-uSaO4gnW+b3Y2aWoWfFpX62vn2sR3skfhbjsEnaBI81WD1wBLlHZe5sWf0AqjksNdYTbGBEd0UasQMT3SNV15g==}
     dev: false
 
   /tailwindcss@4.1.18:
